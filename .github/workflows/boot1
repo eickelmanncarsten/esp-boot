@@ -1,70 +1,75 @@
-esphome:
-  name: esp-boot
-  friendly_name: ESP-Boot
-  on_boot:
-    priority: -100
-    then:
-      - light.turn_on: display_backlight
+name: ESPHome Compile
 
-esp32:
-  board: esp32-s3-devkitc-1
-  framework:
-    type: arduino
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**.yaml'
+      - 'my_components/**'
+      - '.github/workflows/esphome-compile.yml'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
-logger:
-  level: DEBUG
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install ESPHome
+      run: pip install esphome
+    
+    - name: Compile ESP-Boot
+      run: esphome compile esp-boot.yaml
+    
+    - name: Upload firmware artifact
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: firmware-esp-boot
+        path: .esphome/build/esp-boot/.pioenvs/esp32-s3-devkitc-1/firmware.bin
+        retention-days: 30name: ESPHome Compile
 
-external_components:
-  - source:
-      type: local
-      path: my_components
-    components: [ custom_backlight, ft6236 ]
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**.yaml'
+      - 'my_components/**'
+      - '.github/workflows/esphome-compile.yml'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
-wifi:
-  ssid: "Router"
-  password: "DEIN_WLAN_PASSWORT"
-
-api:
-ota:
-  - platform: esphome
-
-# I2C auf den korrekten 3.5"-Pins laut Schaltplan
-i2c:
-  - id: bus_a
-    sda: GPIO4
-    scl: GPIO5
-    frequency: 400khz
-    scan: true
-
-spi:
-  - id: spi_bus
-    clk_pin: GPIO10
-    mosi_pin: GPIO11
-
-pca9554:
-  - id: tca9554_hub
-    address: 0x20
-
-# Nutzt deine custom_backlight-Komponente
-output:
-  - platform: custom_backlight
-    id: backlight_output
-
-light:
-  - platform: binary
-    name: "Display Backlight"
-    output: backlight_output
-    id: display_backlight
-
-display:
-  platform: ili9xxx
-  id: display_lcd
-  spi_id: spi_bus
-  model: ST7789V
-  invert_colors: true
-  cs_pin: GPIO9
-  dc_pin: GPIO13
-  reset_pin: GPIO14
-  rotation: 0°
-  lambda: |-
-    it.fill(Color(255, 0, 0));
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install ESPHome
+      run: pip install esphome
+    
+    - name: Compile ESP-Boot
+      run: esphome compile esp-boot.yaml
+    
+    - name: Upload firmware artifact
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: firmware-esp-boot
+        path: .esphome/build/esp-boot/.pioenvs/esp32-s3-devkitc-1/firmware.bin
+        retention-days: 30
