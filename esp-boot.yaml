@@ -12,12 +12,16 @@ esp32:
   framework:
     type: esp-idf
 
+# LÖSUNG FÜR DEN SPEICHER: Aktiviert den externen PSRAM für den Display-Puffer
+psram:
+
 logger:
   level: DEBUG
 
+# Setze hier deine echten WLAN-Daten ein!
 wifi:
-  ssid: "MeinOeffentlichesWLAN"
-  password: "EinSicheresPasswort123"
+  ssid: "FRITZ!Box 7590 JL"
+  password: "28182272528993262336"
 
 improv_serial:
 
@@ -57,7 +61,9 @@ display:
     invert_colors: false
     cs_pin: GPIO42
     dc_pin: GPIO45
+    # Hinweis: GPIO45 ist ein Strapping-Pin. Wenn das Display beim Booten zickt,
+    # liegt das an der Hardware-Vorgabe des Waveshare-Boards.
     reset_pin: GPIO40
     rotation: 0°
     lambda: |-
-      it.fill(Color(255, 0, 0)); // KORREKTUR: C++ Kommentar mit zwei Schraegstrichen
+      it.fill(Color(255, 0, 0));
