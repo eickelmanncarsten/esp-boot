@@ -46,9 +46,9 @@ output:
     id: backlight_output
     pca9554_id: pca9554_hub
 
-# Die korrekte, moderne Treiberplattform für ESPHome 2026+
+# Der einzig wahre Core-Treiber für FT6336 in ESPHome
 touchscreen:
-  - platform: ft6xx6
+  - platform: ft5x06
     id: touch_screen
     i2c_id: bus_a
     address: 0x38
