@@ -24,6 +24,12 @@ wifi:
   ssid: "MeinOeffentlichesWLAN"
   password: "EinSicheresPasswort123"
 
+# Das Captive Portal öffnet einen Access Point, falls kein WLAN gefunden wird
+captive_portal:
+
+# Improv erlaubt die Konfiguration direkt über web.esphome.io per USB/Bluetooth
+improv_serial:
+
 api:
 ota:
   - platform: esphome
