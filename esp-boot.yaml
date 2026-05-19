@@ -21,8 +21,9 @@ external_components:
     components: [ custom_backlight, ft6236 ]
 
 wifi:
-  ssid: "FRITZ!Box 7590 JL"
-  password: "DEIN_WLAN_PASSWORT"
+ wifi:
+  ssid: "MeinOeffentlichesWLAN"
+  password: "EinSicheresPasswort123"
 
 api:
 ota:
