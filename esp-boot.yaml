@@ -1,74 +1,67 @@
 esphome:
   name: esp-boot
   friendly_name: ESP-Boot
-  on_boot:
-    priority: -100
-    then:
-      - light.turn_on: display_backlight
 
 esp32:
   board: esp32-s3-devkitc-1
   framework:
-    type: arduino
+    type: esp-idf
 
+# Logger-Aktivierung für die Konsole
 logger:
   level: DEBUG
 
-external_components:
-  - source:
-      type: local
-      path: my_components
-    components: [ custom_backlight ]
-
+# WLAN-Konfiguration mit Fallback-Mechanismen
 wifi:
   ssid: "MeinOeffentlichesWLAN"
   password: "EinSicheresPasswort123"
 
-# Das Captive Portal öffnet einen Access Point, falls kein WLAN gefunden wird
-captive_portal:
-
-# Improv erlaubt die Konfiguration direkt über web.esphome.io per USB/Bluetooth
+# Ermöglicht die WLAN-Konfiguration direkt über web.esphome.io per USB
 improv_serial:
 
-api:
-ota:
-  - platform: esphome
+# Öffnet einen eigenen Access-Point, falls das WLAN nicht erreichbar ist
+captive_portal:
 
+# Korrigierter I2C-Bus für das 3.5″ Waveshare Board (GPIO 6 und 7)
 i2c:
   - id: bus_a
-    sda: GPIO4
-    scl: GPIO5
+    sda: GPIO6
+    scl: GPIO7
     frequency: 400khz
     scan: true
 
+# SPI-Bus für das Display
 spi:
   - id: spi_bus
-    clk_pin: GPIO10
-    mosi_pin: GPIO11
+    clk_pin: GPIO47
+    mosi_pin: GPIO41
 
+# Port-Expander auf dem I2C-Bus (Adresse 0x20)
 pca9554:
-  - id: tca9554_hub
+  - id: pca9554_hub
     address: 0x20
+    i2c_id: bus_a
 
-output:
-  - platform: custom_backlight
-    id: backlight_output
+# Touchscreen-Konfiguration (FT6336 auf Adresse 0x38)
+touchscreen:
+  - platform: ft6x36
+    id: touch_screen
+    i2c_id: bus_a
+    interrupt_pin: GPIO5
 
-light:
-  - platform: binary
-    name: "Display Backlight"
-    output: backlight_output
-    id: display_backlight
-
+# Exakte Display-Konfiguration für den ST7796-Chip (320x480)
 display:
-  platform: ili9xxx
-  id: display_lcd
-  spi_id: spi_bus
-  model: ST7789V
-  invert_colors: true
-  cs_pin: GPIO9
-  dc_pin: GPIO13
-  reset_pin: GPIO14
-  rotation: 0°
-  lambda: |-
-    it.fill(Color(255, 0, 0));
+  - platform: ili9xxx
+    id: display_lcd
+    spi_id: spi_bus
+    model: ST7796
+    dimensions:
+      width: 320
+      height: 480
+    invert_colors: false
+    cs_pin: GPIO42
+    dc_pin: GPIO45
+    reset_pin: GPIO40
+    rotation: 0°
+    lambda: |-
+      it.fill(Color(255, 0, 0)); # Färbt den Bildschirm beim Start komplett Rot als Test
