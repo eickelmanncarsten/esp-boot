@@ -43,11 +43,15 @@ pca9554:
     i2c_id: bus_a
 
 # Touchscreen-Konfiguration (FT6336 auf Adresse 0x38)
-touchscreen:
-  - platform: ft6x36
-    id: touch_screen
-    i2c_id: bus_a
-    interrupt_pin: GPIO5
+# HINWEIS: Custom Component ft6x36 ist noch nicht implementiert
+# Bitte entweder:
+# 1. Custom Component für ft6x36 in my_components/ft6x36/ erstellen, oder
+# 2. Diese Sektion auskommentieren, bis die Component verfügbar ist
+# touchscreen:
+#   - platform: ft6x36
+#     id: touch_screen
+#     i2c_id: bus_a
+#     interrupt_pin: GPIO5
 
 # Exakte Display-Konfiguration für den ST7796-Chip (320x480)
 display:
