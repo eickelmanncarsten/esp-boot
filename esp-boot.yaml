@@ -2,6 +2,7 @@ esphome:
   name: esp-boot
   friendly_name: ESP-Boot
 
+# Sorgt dafür, dass deine Custom Backlight-Dateien in "my_components" gefunden werden
 external_components:
   - source:
       type: local
@@ -23,6 +24,7 @@ improv_serial:
 
 captive_portal:
 
+# Die korrekten I2C-Pins für das Waveshare 3.5″ Board
 i2c:
   - id: bus_a
     sda: GPIO6
@@ -30,28 +32,32 @@ i2c:
     frequency: 400khz
     scan: true
 
+# SPI-Bus für die Kommunikation mit dem Display
 spi:
   - id: spi_bus
     clk_pin: GPIO47
     mosi_pin: GPIO41
 
+# Der integrierte Port-Expander auf dem Board (Adresse 0x20)
 pca9554:
   - id: pca9554_hub
     address: 0x20
     i2c_id: bus_a
 
+# Aktivierung deiner Custom Component für das Display-Licht an Pin 5 des Expanders
 output:
   - platform: custom_backlight
     id: backlight_output
     pca9554_id: pca9554_hub
 
-# JETZT KORREKT: Der moderne Focaltech-Treiber
+# Die korrekte, moderne Treiberplattform für ESPHome 2026+ (Focaltech-Chips wie FT6336)
 touchscreen:
   - platform: focaltech
     id: touch_screen
     i2c_id: bus_a
     address: 0x38
 
+# Das eigentliche Display-Modul für den ST7796-Chip (320x480)
 display:
   - platform: ili9xxx
     id: display_lcd
@@ -67,4 +73,4 @@ display:
     reset_pin: GPIO40
     rotation: 0°
     lambda: |-
-      it.fill(Color(255, 0, 0));
+      it.fill(Color(255, 0, 0)); # Färbt den Bildschirm beim Start zum Testen rot
