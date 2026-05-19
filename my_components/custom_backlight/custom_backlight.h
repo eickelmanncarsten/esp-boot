@@ -9,18 +9,23 @@ namespace custom_backlight {
 
 class CustomBacklightOutput : public output::BinaryOutput, public Component {
  public:
+  // Wir übergeben dem Backlight die Instanz unseres Expanders
+  void set_pin_hub(pca9554::PCA9554Component *hub) { this->hub_ = hub; }
+
   void setup() override {
-    // Wartet, bis der I2C-Expander bereit ist, und schaltet das Backlight initial ein
+    // Schaltet das Backlight beim Starten initial ein
     this->write_state(true);
   }
 
   void write_state(bool state) override {
-    // Holt sich die Instanz des TCA9554-Hubs aus der laufenden Applikation
-    // Pin 5 steuert laut Schaltplan die Hintergrundbeleuchtung
-    if (pca9554::global_pca9554_channels[0] != nullptr) {
-        pca9554::global_pca9554_channels[0]->digital_write(5, state);
+    // Greift sauber über die offizielle ESPHome-Komponente auf Pin 5 zu
+    if (this->hub_ != nullptr) {
+        this->hub_->digital_write(5, state);
     }
   }
+
+ protected:
+  pca9554::PCA9554Component *hub_{nullptr};
 };
 
 }  // namespace custom_backlight
