@@ -68,3 +68,13 @@ display:
     rotation: 0°
     lambda: |-
       it.fill(Color(255, 0, 0));
+      
+ touchscreen:
+  - platform: ft6336r
+    id: my_touchscreen
+    display: display_lcd
+    # Adresse ist bei FocalTech fast immer standardmäßig 0x38
+    address: 0x38  
+    # Hier kommen die Pins hin, an denen der Interrupt (IRQ) 
+    # und eventuell Reset des Touch-Chips hängen, falls genutzt:
+    # interrupt_pin: GPIOX
