@@ -11,15 +11,19 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Hier fixen wir global die Node.js 24 Warnung für alle Schritte
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   compile:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4  # Upgrade auf v4 für Node.js-Kompatibilität
+    - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v5  # Upgrade auf v5
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         
@@ -45,8 +49,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: firmware-esp-boot
-        # Pfad korrigiert von 'esp32-s3-devkitc-1' zu 'esp-boot'
-        # Wir fangen sowohl ota als auch factory ab
         path: |
           .esphome/build/esp-boot/.pioenvs/esp-boot/firmware.factory.bin
           .esphome/build/esp-boot/.pioenvs/esp-boot/firmware.ota.bin
