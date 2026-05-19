@@ -18,7 +18,7 @@ external_components:
   - source:
       type: local
       path: my_components
-    components: [ custom_backlight, ft6236 ]
+    components: [ custom_backlight ]
 
 wifi:
   ssid: "FRITZ!Box 7590 JL"
