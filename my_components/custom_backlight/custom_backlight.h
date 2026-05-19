@@ -9,18 +9,16 @@ namespace custom_backlight {
 
 class CustomBacklightOutput : public output::BinaryOutput, public Component {
  public:
-  // Wir übergeben dem Backlight die Instanz unseres Expanders
   void set_pin_hub(pca9554::PCA9554Component *hub) { this->hub_ = hub; }
 
   void setup() override {
-    // Schaltet das Backlight beim Starten initial ein
-    this->write_state(true);
+    this->write_state(true); // Schaltet das Backlight initial ein
   }
 
   void write_state(bool state) override {
-    // Greift sauber über die offizielle ESPHome-Komponente auf Pin 5 zu
+    // KORREKTUR: pin_write statt digital_write
     if (this->hub_ != nullptr) {
-        this->hub_->digital_write(5, state);
+        this->hub_->pin_write(5, state); 
     }
   }
 
