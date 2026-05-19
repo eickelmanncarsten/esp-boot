@@ -68,4 +68,4 @@ display:
     reset_pin: GPIO40
     rotation: 0°
     lambda: |-
-      it.fill(Color(255, 0, 0)); # Färbt den Bildschirm beim Start komplett Rot als Test
+      it.fill(Color(255, 0, 0)); # Bildschirm beim Start rot faerben zum Testen
