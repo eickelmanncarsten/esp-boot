@@ -1,40 +1,40 @@
 name: ESPHome Compile
 
 on:
-  push:
-    branches: [ main, develop ]
-    paths:
-      - '**.yaml'
-      - 'my_components/**'
-      - '.github/workflows/esphome-compile.yml'
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
+  push:
+    branches: [ "main", "master" ]
 
 jobs:
   compile:
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install ESPHome
-      run: pip install esphome
-    
-    - name: Compile ESP-Boot
-      run: esphome compile esp-boot.yaml
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: my-artifact
-        path: path/to/artifact
-       with:
-        name: firmware-esp-boot
-        path: .esphome/build/esp-boot/.pioenvs/esp32-s3-devkitc-1/firmware.bin
-        retention-days: 30
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5.4.0
+        with:
+          python-version: '3.11'
+
+      - name: Cache PlatformIO & ESPHome
+        uses: actions/cache@v4.2.2
+        with:
+          path: |
+            ~/.platformio
+            ~/.esphome
+          key: ${{ runner.os }}-esphome-${{ hashFiles('esp-boot.yaml') }}
+
+      - name: Install ESPHome
+        run: |
+          pip install esphome
+
+      - name: Compile ESP-Boot
+        run: |
+          esphome compile esp-boot.yaml
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: firmware-esp-boot
+          path: .esphome/build/esp-boot/.pioenvs/esp-boot/firmware.factory.bin
