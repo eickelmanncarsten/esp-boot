@@ -1,36 +1,32 @@
-name: ESPHome Compile
+name: Compile ESP-Boot
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ "main", "master" ]
-
-# HIER LÖSEN WIR ES: Wir zwingen den Runner per Umgebungsvariable auf Node 24
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   compile:
     runs-on: ubuntu-latest
     steps:
-      # Umstellung auf v5 (nativ Node 24 kompatibel)
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      # Umstellung auf v6 (nativ Node 24 kompatibel)
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # Umstellung auf v5 (nativ Node 24 kompatibel)
       - name: Cache PlatformIO & ESPHome
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: |
             ~/.platformio
             ~/.esphome
           key: ${{ runner.os }}-esphome-${{ hashFiles('esp-boot.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-esphome-
 
       - name: Install ESPHome
         run: |
@@ -39,9 +35,3 @@ jobs:
       - name: Compile ESP-Boot
         run: |
           esphome compile esp-boot.yaml
-
-      - name: Upload firmware artifact
-        uses: actions/upload-artifact@v4.6.1
-        with:
-          name: firmware-esp-boot
-          path: .esphome/build/esp-boot/.pioenvs/esp-boot/firmware.factory.bin
