@@ -1,40 +1,70 @@
-name: ESPHome Compile
+esphome:
+  name: esp-boot
+  friendly_name: ESP-Boot
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [ "main", "master" ]
+# HIER WIRD DEINE KOMPONENTE REGISTRIERT:
+external_components:
+  - source:
+      type: local
+      path: my_components
 
-jobs:
-  compile:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4.2.2
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
 
-      - name: Set up Python
-        uses: actions/setup-python@v5.4.0
-        with:
-          python-version: '3.11'
+logger:
+  level: DEBUG
 
-      - name: Cache PlatformIO & ESPHome
-        uses: actions/cache@v4.2.2
-        with:
-          path: |
-            ~/.platformio
-            ~/.esphome
-          key: ${{ runner.os }}-esphome-${{ hashFiles('esp-boot.yaml') }}
+wifi:
+  ssid: "MeinOeffentlichesWLAN"
+  password: "EinSicheresPasswort123"
 
-      - name: Install ESPHome
-        run: |
-          pip install esphome
+improv_serial:
 
-      - name: Compile ESP-Boot
-        run: |
-          esphome compile esp-boot.yaml
+captive_portal:
 
-      - name: Upload firmware artifact
-        uses: actions/upload-artifact@v4.6.1
-        with:
-          name: firmware-esp-boot
-          path: .esphome/build/esp-boot/.pioenvs/esp-boot/firmware.factory.bin
+i2c:
+  - id: bus_a
+    sda: GPIO6
+    scl: GPIO7
+    frequency: 400khz
+    scan: true
+
+spi:
+  - id: spi_bus
+    clk_pin: GPIO47
+    mosi_pin: GPIO41
+
+pca9554:
+  - id: pca9554_hub
+    address: 0x20
+    i2c_id: bus_a
+
+output:
+  - platform: custom_backlight
+    id: backlight_output
+    pca9554_id: pca9554_hub
+
+touchscreen:
+  - platform: ft6236
+    id: touch_screen
+    i2c_id: bus_a
+    address: 0x38
+
+display:
+  - platform: ili9xxx
+    id: display_lcd
+    spi_id: spi_bus
+    model: ST7796
+    dimensions:
+      width: 320
+      height: 480
+    data_rate: 40MHz
+    invert_colors: false
+    cs_pin: GPIO42
+    dc_pin: GPIO45
+    reset_pin: GPIO40
+    rotation: 0°
+    lambda: |-
+      it.fill(Color(255, 0, 0));
