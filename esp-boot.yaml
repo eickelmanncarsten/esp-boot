@@ -2,7 +2,6 @@ esphome:
   name: esp-boot
   friendly_name: ESP-Boot
 
-# HIER WIRD DEINE KOMPONENTE REGISTRIERT:
 external_components:
   - source:
       type: local
@@ -46,9 +45,9 @@ output:
     id: backlight_output
     pca9554_id: pca9554_hub
 
-# Der einzig wahre Core-Treiber für FT6336 in ESPHome
+# JETZT KORREKT: Der moderne Focaltech-Treiber
 touchscreen:
-  - platform: ft5x06
+  - platform: focaltech
     id: touch_screen
     i2c_id: bus_a
     address: 0x38
