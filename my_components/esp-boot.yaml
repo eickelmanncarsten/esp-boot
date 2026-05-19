@@ -7,22 +7,17 @@ esp32:
   framework:
     type: esp-idf
 
-# Logger-Aktivierung für die Konsole
 logger:
   level: DEBUG
 
-# WLAN-Konfiguration mit Fallback-Mechanismen
 wifi:
   ssid: "MeinOeffentlichesWLAN"
   password: "EinSicheresPasswort123"
 
-# Ermöglicht die WLAN-Konfiguration direkt über web.esphome.io per USB
 improv_serial:
 
-# Öffnet einen eigenen Access-Point, falls das WLAN nicht erreichbar ist
 captive_portal:
 
-# Korrigierter I2C-Bus für das 3.5″ Waveshare Board (GPIO 6 und 7)
 i2c:
   - id: bus_a
     sda: GPIO6
@@ -30,26 +25,24 @@ i2c:
     frequency: 400khz
     scan: true
 
-# SPI-Bus für das Display
 spi:
   - id: spi_bus
     clk_pin: GPIO47
     mosi_pin: GPIO41
 
-# Port-Expander auf dem I2C-Bus (Adresse 0x20)
 pca9554:
   - id: pca9554_hub
     address: 0x20
     i2c_id: bus_a
 
-# Touchscreen-Konfiguration (FT6336 auf Adresse 0x38)
-touchscreen:
-  - platform: ft6x36
-    id: touch_screen
-    i2c_id: bus_a
-    interrupt_pin: GPIO5
+# AKTIVIERUNG DEINER CUSTOM COMPONENT:
+# Erstellt einen binären Ausgang für das Licht an Pin 5 des Expanders
+output:
+  - platform: custom_backlight
+    id: backlight_output
+    pca9554_id: pca9554_hub
 
-# Exakte Display-Konfiguration für den ST7796-Chip (320x480)
+# Das eigentliche Display-Modul
 display:
   - platform: ili9xxx
     id: display_lcd
@@ -64,4 +57,4 @@ display:
     reset_pin: GPIO40
     rotation: 0°
     lambda: |-
-      it.fill(Color(255, 0, 0)); # Färbt den Bildschirm beim Start komplett Rot als Test
+      it.fill(Color(255, 0, 0)); # Macht den Bildschirm rot
