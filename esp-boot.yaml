@@ -21,7 +21,6 @@ external_components:
     components: [ custom_backlight ]
 
 wifi:
- wifi:
   ssid: "MeinOeffentlichesWLAN"
   password: "EinSicheresPasswort123"
 
