@@ -2,7 +2,6 @@ esphome:
   name: esp-boot
   friendly_name: ESP-Boot
 
-# Verknüpfung zu deinen Custom-Backlight-Dateien
 external_components:
   - source:
       type: local
@@ -24,7 +23,6 @@ improv_serial:
 
 captive_portal:
 
-# Aktiviert den I2C-Bus (Pins 6 & 7) samt automatischem Scanner beim Booten
 i2c:
   - id: bus_a
     sda: GPIO6
@@ -32,25 +30,21 @@ i2c:
     frequency: 400khz
     scan: true
 
-# SPI-Bus für das Display
 spi:
   - id: spi_bus
     clk_pin: GPIO47
     mosi_pin: GPIO41
 
-# Der Port-Expander (Adresse 0x20)
 pca9554:
   - id: pca9554_hub
     address: 0x20
     i2c_id: bus_a
 
-# Deine Custom Component für das Display-Licht
 output:
   - platform: custom_backlight
     id: backlight_output
     pca9554_id: pca9554_hub
 
-# Das Display-Modul für den ST7796-Chip (320x480)
 display:
   - platform: ili9xxx
     id: display_lcd
@@ -66,4 +60,4 @@ display:
     reset_pin: GPIO40
     rotation: 0°
     lambda: |-
-      it.fill(Color(255, 0, 0)); # Macht den Bildschirm beim Start rot
+      it.fill(Color(255, 0, 0)); // KORREKTUR: C++ Kommentar mit zwei Schraegstrichen
