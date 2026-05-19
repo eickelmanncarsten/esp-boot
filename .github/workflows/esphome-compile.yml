@@ -29,9 +29,11 @@ jobs:
     - name: Compile ESP-Boot
       run: esphome compile esp-boot.yaml
     
-    - name: Upload firmware artifact
-      if: success()
-      uses: actions/upload-artifact@v3
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: path/to/artifact
       with:
         name: firmware-esp-boot
         path: .esphome/build/esp-boot/.pioenvs/esp32-s3-devkitc-1/firmware.bin
