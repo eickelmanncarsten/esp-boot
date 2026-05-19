@@ -33,10 +33,7 @@ jobs:
         path: |
           ~/.platformio
           ~/.cache/pip
-          .esphome
-        key: ${{ runner.os }}-esphome-${{ hashFiles('esp-boot.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-esphome-
+  
     
     - name: Install ESPHome
       run: pip install esphome
