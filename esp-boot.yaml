@@ -1,18 +1,22 @@
 esphome:
   name: esp-boot
   on_boot:
-    priority: 800.0  # Sehr hohe Priorität, läuft vor fast allem anderen
+    priority: 800.0  # Läuft ganz am Anfang, noch vor dem I2C-Setup
     then:
-      - text_sensor.template.publish:
-          id: bst
-          state: "Booting..."
-      # Wir initialisieren den Touch-Reset manuell und ziehen ihn auf HIGH
       - lambda: |-
-          pinMode(5, OUTPUT);     // Ersetze 5 mit deinem Touch-Reset-Pin
-          digitalWrite(5, LOW);   // Kurz resetten
-          delay(10);
-          digitalWrite(5, HIGH);  // Aktivieren, damit er den I2C-Bus freigibt
+          // Wir konfigurieren den Pin als Ausgang und ziehen ihn auf HIGH
+          gpio_config_t io_conf = {};
+          io_conf.intr_type = GPIO_INTR_DISABLE;
+          io_conf.mode = GPIO_MODE_OUTPUT;
+          io_conf.pin_bit_mask = (1ULL << 5); // <--- Hier die 5 durch deinen Touch-Reset-Pin ersetzen
+          io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+          io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+          gpio_config(&io_conf);
 
+          // Erst kurz LOW für den Reset, dann HIGH, um den Bus freizugeben
+          gpio_set_level((gpio_num_t)5, 0); // <--- Hier auch die Pin-Nummer anpassen
+          esp_rom_delay_us(10000);          // 10 Millisekunden warten
+          gpio_set_level((gpio_num_t)5, 1); // <--- Und hier
 esp32:
   board: esp32-s3-devkitc-1
   framework:
