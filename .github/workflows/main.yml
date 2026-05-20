@@ -24,14 +24,12 @@ jobs:
           path: |
             ~/.platformio
             ~/.esphome
-          key: ${{ runner.os }}-esphome-${{ hashFiles('esp-boot.yaml') }}
+          key: ${{ runner.os }}-esphome-v1
           restore-keys: |
             ${{ runner.os }}-esphome-
 
       - name: Install ESPHome
-        run: |
-          pip install esphome
+        run: pip install esphome
 
       - name: Compile ESP-Boot
-        run: |
-          esphome compile esp-boot.yaml
+        run: esphome compile esp-boot.yaml
