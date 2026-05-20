@@ -12,7 +12,7 @@ esp32:
   framework:
     type: esp-idf
 
-# Korrekte PSRAM-Konfiguration für das Waveshare S3-Board
+# Zwingend notwendig für das Waveshare-Board (8MB Octal-PSRAM)
 psram:
   mode: octal
 
@@ -66,9 +66,9 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Der offizielle, stabile Touch-Treiber deiner installierten Version
+# Der offizielle, topaktuelle Name für Focaltech-Controller im ESPHome-Core
 touchscreen:
-  - platform: focaltech
+  - platform: ft6x36
     id: my_touchscreen
     display: display_lcd
     address: 0x38
