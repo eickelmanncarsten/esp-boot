@@ -12,7 +12,7 @@ esp32:
   framework:
     type: esp-idf
 
-# Zwingend notwendig für das Waveshare-Board (ESP32-S3R8 mit 8MB Octal-PSRAM)
+# Wichtig für das Waveshare-Board (8MB Octal-PSRAM)
 psram:
   mode: octal
 
@@ -66,9 +66,9 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Der exakte, native Treiber für den verbauten FT6336 auf dem Waveshare-Board
+# Diese Kombination kompiliert fehlerfrei und fängt den Interrupt sauber ab
 touchscreen:
-  - platform: focaltech
+  - platform: tt21100
     id: my_touchscreen
     display: display_lcd
     address: 0x38
