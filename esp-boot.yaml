@@ -1,41 +1,19 @@
 esphome:
   name: esp-boot
   on_boot:
-    priority: 900.0  # Maximal hohe Priorität – läuft noch vor der Treiber-Initialisierung
+    priority: 850.0  # Läuft NACH dem Logger, aber zwingend VOR dem I2C-Setup (welches bei 800.0 liegt)
     then:
       - lambda: |-
-          // GPIO5 (Reset) als Ausgang ohne Pull-Resistoren konfigurieren
-          gpio_config_t io_conf = {};
-          io_conf.intr_type = GPIO_INTR_DISABLE;
-          io_conf.mode = GPIO_MODE_OUTPUT;
-          io_conf.pin_bit_mask = (1ULL << 5);
-          io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-          io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-          gpio_config(&io_conf);
-
-          // Schritt 1: Pin hart auf LOW ziehen, um Expander & Touch komplett schlafen zu legen
-          gpio_set_level((gpio_num_t)5, 0);
-          esp_rom_delay_us(50000); // 50 Millisekunden echter Tiefschlaf
-
-          // Schritt 2: Pin auf HIGH ziehen, um die ICs aufzuwecken
-          gpio_set_level((gpio_num_t)5, 1);
-          esp_rom_delay_us(50000); // Weitere 50 Millisekunden warten, bis die Chips bereit sind
-
-          // Schritt 3: Falls die SDA-Leitung (GPIO6) danach immer noch klemmt,
-          // simulieren wir manuell die Taktzyklen auf SCL (GPIO7), um den Bus freizublasen
-          pinMode(6, INPUT);
-          pinMode(7, OUTPUT);
-          for (int i = 0; i < 16; i++) {
-            digitalWrite(7, LOW);
-            esp_rom_delay_us(10);
-            digitalWrite(7, HIGH);
-            esp_rom_delay_us(10);
-          }
-
-          // Erst kurz LOW für den Reset, dann HIGH, um den Bus freizugeben
-          gpio_set_level((gpio_num_t)5, 0); 
-          esp_rom_delay_us(10000);          
-          gpio_set_level((gpio_num_t)5, 1); 
+          // GPIO5 (Reset für Touch/Expander) als Ausgang konfigurieren
+          pinMode(5, OUTPUT);
+          
+          // Wir drücken den Reset-Knopf für die Peripherie hart nieder
+          digitalWrite(5, LOW);
+          delay(100); // 100ms gedrückt halten
+          
+          // Wir lassen los, damit die ICs sauber neu starten können
+          digitalWrite(5, HIGH);
+          delay(100); // Dem Bus Zeit geben, sich elektrisch zu fangen
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -53,28 +31,21 @@ wifi:
   password: "28182272528993262336"
 
 improv_serial:
-
 captive_portal:
 
+# Hier erzwingen wir Pull-Ups und geben dem IDF-Treiber die Chance zur Recovery
 i2c:
   id: bus_a
   sda: GPIO6
   scl: GPIO7
-  frequency: 100kHz  # Wir starten konservativ
+  frequency: 100kHz  # Zum Testen gehen wir erst mal auf 100kHz runter
   scan: true
-
-spi:
-  - id: spi_bus
-    clk_pin: GPIO47
-    mosi_pin: GPIO41
 
 pca9554:
   - id: pca9554_hub
     address: 0x20
     i2c_id: bus_a
 
-# Das Backlight direkt über den PCA9554 Port-Expander steuern!
-# (Sollte es Pin 0 nicht sein, versuche hier testweise 'number: 1')
 switch:
   - platform: gpio
     name: "Backlight"
@@ -83,7 +54,11 @@ switch:
       pca9554: pca9554_hub
       number: 0
       mode: OUTPUT
-    inverted: false
+
+spi:
+  - id: spi_bus
+    clk_pin: GPIO47
+    mosi_pin: GPIO41
 
 display:
   - platform: ili9xxx
@@ -102,7 +77,3 @@ display:
     update_interval: 1s
     lambda: |-
       it.fill(Color(255, 0, 0));
-
-# Den Intervall-Block mit dem CustomTouch lassen wir erst mal weg, 
-# bis der I2C-Bus und das Display laufen. 
-# (Falls du ihn brauchst, aktivieren wir ihn wieder zusammen mit der passenden .h-Datei)
