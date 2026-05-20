@@ -5,6 +5,9 @@ esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: arduino
+    # Hier zwingen wir PlatformIO, die Wire-Bibliothek einzubinden:
+  libraries:
+    - Wire
 
 psram:
   mode: octal
