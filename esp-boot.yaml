@@ -1,6 +1,11 @@
 esphome:
   name: esp-boot
   friendly_name: ESP-Boot
+  # Schaltet das Backlight aktiv ein, sobald das gesamte System (inkl. Expander) hochgefahren ist
+  on_boot:
+    priority: -100
+    then:
+      - output.turn_on: backlight_output
 
 external_components:
   - source:
@@ -12,6 +17,7 @@ esp32:
   framework:
     type: esp-idf
 
+# Wichtig für das Waveshare-Board (8MB Octal-PSRAM)
 psram:
   mode: octal
 
@@ -62,17 +68,11 @@ display:
     dc_pin: GPIO45
     reset_pin: GPIO40
     rotation: 0°
-    update_interval: 1s  # Zwingt das Display, sich jede Sekunde neu aufzubauen
+    update_interval: 1s  # Zwingt das Display, sich jede Sekunde neu zu zeichnen
     lambda: |-
-      it.fill(Color(255, 0, 0)); // Zeichnet das Display permanent rot
+      it.fill(Color(255, 0, 0));
 
-# Sobald der ESP32 fertig gebootet hat, knipsen wir das Backlight an!
-esphome:
-  on_boot:
-    priority: -100 # Wartet, bis absolut ALLES (auch der PCA9554) bereit ist
-    then:
-      - output.turn_on: backlight_output
-
+# Unsere unzerstörbare Inline-Komponente, die den Touchscreen-Fehler umgeht
 custom_component:
   - lambda: |-
       class CustomTouch : public Component, public i2c::I2CDevice {
