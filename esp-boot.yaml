@@ -1,20 +1,36 @@
 esphome:
   name: esp-boot
-  # Falls du eine separate custom_touch.h Datei hast, lade sie hier:
-  # includes:
-  #   - custom_touch.h
   on_boot:
-    priority: 800.0  # Läuft ganz am Anfang, noch vor dem I2C-Setup
+    priority: 900.0  # Maximal hohe Priorität – läuft noch vor der Treiber-Initialisierung
     then:
       - lambda: |-
-          // Wir konfigurieren Pin 5 als Ausgang und ziehen ihn auf HIGH
+          // GPIO5 (Reset) als Ausgang ohne Pull-Resistoren konfigurieren
           gpio_config_t io_conf = {};
           io_conf.intr_type = GPIO_INTR_DISABLE;
           io_conf.mode = GPIO_MODE_OUTPUT;
-          io_conf.pin_bit_mask = (1ULL << 5); 
+          io_conf.pin_bit_mask = (1ULL << 5);
           io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
           io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
           gpio_config(&io_conf);
+
+          // Schritt 1: Pin hart auf LOW ziehen, um Expander & Touch komplett schlafen zu legen
+          gpio_set_level((gpio_num_t)5, 0);
+          esp_rom_delay_us(50000); // 50 Millisekunden echter Tiefschlaf
+
+          // Schritt 2: Pin auf HIGH ziehen, um die ICs aufzuwecken
+          gpio_set_level((gpio_num_t)5, 1);
+          esp_rom_delay_us(50000); // Weitere 50 Millisekunden warten, bis die Chips bereit sind
+
+          // Schritt 3: Falls die SDA-Leitung (GPIO6) danach immer noch klemmt,
+          // simulieren wir manuell die Taktzyklen auf SCL (GPIO7), um den Bus freizublasen
+          pinMode(6, INPUT);
+          pinMode(7, OUTPUT);
+          for (int i = 0; i < 16; i++) {
+            digitalWrite(7, LOW);
+            esp_rom_delay_us(10);
+            digitalWrite(7, HIGH);
+            esp_rom_delay_us(10);
+          }
 
           // Erst kurz LOW für den Reset, dann HIGH, um den Bus freizugeben
           gpio_set_level((gpio_num_t)5, 0); 
