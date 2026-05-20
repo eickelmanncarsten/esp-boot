@@ -73,6 +73,7 @@ display:
       it.fill(Color(255, 0, 0));
 
 # Hier wird deine neue, native External Component aufgerufen:
-custom_touch:
-  i2c_id: bus_a
-  address: 0x38
+custom_touch:# Am Ende der Datei: Einfach nur die Komponente aktivieren
+
+
+
