@@ -2,21 +2,18 @@ esphome:
   name: esp-boot
   friendly_name: ESP-Boot
 
-# JETZT RECHTSCHREIB- UND EINRÜCKUNGSCONFORM:
+# Nur deine lokale Custom-Komponente bleibt hier drin!
 external_components:
   - source:
       type: local
       path: my_components
-  - source:
-      type: git
-      url: https://github.com/esphome/esphome
-    components: [ focaltech ] # Genau hier auf der Ebene von 'source'!
 
 esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
 
+# Korrekte PSRAM-Konfiguration für das S3-Board
 psram:
   mode: octal
 
@@ -70,7 +67,7 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Der Touchscreen nutzt nun die über Git bereitgestellte Plattform
+# Der offizielle, native Touch-Treiber von ESPHome
 touchscreen:
   - platform: focaltech
     id: my_touchscreen
