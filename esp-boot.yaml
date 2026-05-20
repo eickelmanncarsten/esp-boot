@@ -68,7 +68,7 @@ display:
 
 # Der korrekte Treiber für deinen FocalTech-Touchscreen
 touchscreen:
-  - platform: ft6336r
+  - platform: focaltech_touch
     id: my_touchscreen
     display: display_lcd
     address: 0x38
