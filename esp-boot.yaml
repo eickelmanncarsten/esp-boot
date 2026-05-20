@@ -1,16 +1,15 @@
 esphome:
   name: esp-boot
   friendly_name: ESP-Boot
-  # Schaltet das Backlight aktiv ein, sobald das gesamte System (inkl. Expander) hochgefahren ist
+  # Schaltet das Backlight aktiv ein, sobald das gesamte System hochgefahren ist
   on_boot:
     priority: -100
     then:
       - output.turn_on: backlight_output
-
-external_components:
-  - source:
-      type: local
-      path: my_components
+  # Hier binden wir die C++ Quelltexte direkt und absolut fehlerfrei ein
+  includes:
+    - my_components/custom_touch.h
+    - my_components/custom_backlight.h
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -49,10 +48,16 @@ pca9554:
     address: 0x20
     i2c_id: bus_a
 
+# Das Backlight wird über das C++ Include registriert und mit dem Hub verbunden
 output:
-  - platform: custom_backlight
-    id: backlight_output
-    pca9554_id: pca9554_hub
+  - platform: custom
+    type: binary
+    lambda: |-
+      auto bl = new CustomBacklightOutput();
+      bl->set_pin_hub(id(pca9554_hub));
+      return {bl};
+    outputs:
+      - id: backlight_output
 
 display:
   - platform: ili9xxx
@@ -72,4 +77,9 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-custom_touch:
+# Der Touchscreen wird als generische Custom-Komponente geladen
+sensor:
+  - platform: custom
+    lambda: |-
+      auto touch = new CustomTouch();
+      return {touch};
