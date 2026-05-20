@@ -73,6 +73,3 @@ display:
       it.fill(Color(255, 0, 0));
 
 custom_touch:
-
-
-
