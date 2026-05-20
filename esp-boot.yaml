@@ -6,6 +6,9 @@ external_components:
   - source:
       type: local
       path: my_components
+  # Holt die exakt passende, stabile Touch-Komponente aus dem offiziellen ESPHome-Release
+  - source: github://esphome/esphome@v2024.4.0
+    components: [ focaltech ]
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -66,9 +69,9 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Der offizielle, topaktuelle Name für Focaltech-Controller im ESPHome-Core
+# Nutzt nun die sauber über Git injizierte Plattform
 touchscreen:
-  - platform: ft6x36
+  - platform: focaltech
     id: my_touchscreen
     display: display_lcd
     address: 0x38
