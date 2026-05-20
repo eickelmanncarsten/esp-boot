@@ -1,12 +1,11 @@
 esphome:
   name: esp-boot
   friendly_name: ESP-Boot
-  # Schaltet das Backlight aktiv ein, sobald das gesamte System hochgefahren ist
   on_boot:
     priority: -100
     then:
-      - output.turn_on: backlight_output
-  # Hier binden wir die C++ Quelltexte direkt und absolut fehlerfrei ein
+      # Nutzt jetzt den nativen Switch-Befehl
+      - switch.turn_on: backlight_switch
   includes:
     - my_components/custom_touch.h
     - my_components/custom_backlight.h
@@ -16,7 +15,6 @@ esp32:
   framework:
     type: esp-idf
 
-# Wichtig für das Waveshare-Board (8MB Octal-PSRAM)
 psram:
   mode: octal
 
@@ -48,16 +46,19 @@ pca9554:
     address: 0x20
     i2c_id: bus_a
 
-# Das Backlight wird über das C++ Include registriert und mit dem Hub verbunden
-output:
-  - platform: custom
-    type: binary
-    lambda: |-
-      auto bl = new CustomBacklightOutput();
-      bl->set_pin_hub(id(pca9554_hub));
-      return {bl};
-    outputs:
-      - id: backlight_output
+# Das Backlight steuern wir jetzt über einen absolut standardkonformen Template-Switch!
+switch:
+  - platform: template
+    name: "Backlight"
+    id: backlight_switch
+    optimistic: true
+    turn_on_action:
+      lambda: |-
+        my_bl.set_pin_hub(id(pca9554_hub));
+        my_bl.set_state(true);
+    turn_off_action:
+      lambda: |-
+        my_bl.set_state(false);
 
 display:
   - platform: ili9xxx
@@ -73,13 +74,19 @@ display:
     dc_pin: GPIO45
     reset_pin: GPIO40
     rotation: 0°
-    update_interval: 1s  # Zwingt das Display, sich jede Sekunde neu zu zeichnen
+    update_interval: 1s
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Der Touchscreen wird als generische Custom-Komponente geladen
-sensor:
-  - platform: custom
-    lambda: |-
-      auto touch = new CustomTouch();
-      return {touch};
+# Um den Touchscreen beim Booten einmalig zu initialisieren, 
+# hängen wir uns einfach stressfrei in eine native Boot-Komponente
+interval:
+  - interval: 60s
+    then:
+      - lambda: |-
+          static bool initialized = false;
+          if (!initialized) {
+            auto touch = new CustomTouch();
+            touch->setup();
+            initialized = true;
+          }
