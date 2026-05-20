@@ -6,9 +6,6 @@ esphome:
     priority: -100
     then:
       - output.turn_on: backlight_output
-  # Hier binden wir deine C++ Datei ein, die im Unterordner liegt:
-  includes:
-    - my_components/custom_touch.h
 
 external_components:
   - source:
@@ -75,11 +72,7 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Das ersetzt den alten custom_component Block sauber für moderne ESPHome-Versionen
-sensor:
-  - platform: custom
-    lambda: |-
-      auto my_touch = new CustomTouch();
-      my_touch->set_i2c_bus(id(bus_a));
-      my_touch->set_i2c_address(0x38);
-      return {my_touch};
+# Hier wird deine neue, native External Component aufgerufen:
+custom_touch:
+  i2c_id: bus_a
+  address: 0x38
