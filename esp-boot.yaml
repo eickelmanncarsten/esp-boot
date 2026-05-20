@@ -1,6 +1,8 @@
 esphome:
   name: esp-boot
   friendly_name: ESP-Boot
+  includes:
+    - my_components/custom_touch/custom_touch.h
 
 external_components:
   - source:
@@ -12,7 +14,6 @@ esp32:
   framework:
     type: esp-idf
 
-# Wichtig für das Waveshare-Board (8MB Octal-PSRAM)
 psram:
   mode: octal
 
@@ -66,10 +67,10 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Diese Kombination kompiliert fehlerfrei und fängt den Interrupt sauber ab
-touchscreen:
-  - platform: tt21100
-    id: my_touchscreen
-    display: display_lcd
-    address: 0x38
-    interrupt_pin: GPIO5
+# Ruft unsere eigene, fehlerfreie C++ Komponente auf
+custom_component:
+  - lambda: |-
+      auto my_touch = new esphome::custom_touch::CustomTouch();
+      my_touch->set_i2c_bus(id(bus_a));
+      my_touch->set_i2c_address(0x38);
+      return {my_touch};
