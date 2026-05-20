@@ -6,7 +6,7 @@ external_components:
   - source:
       type: local
       path: my_components
-  # Die korrekte, kompakte Syntax inklusive Branch-Angabe (@main)
+  # Holt die Touch-Komponente sauber über das offizielle GitHub-HTTPS-Protokoll
   - source: github://vpaeder/esphome-focaltech@main
     components: [ focaltech ]
 
@@ -15,6 +15,7 @@ esp32:
   framework:
     type: esp-idf
 
+# Zwingend notwendig für das Waveshare-Board (ESP32-S3R8 mit 8MB Octal-PSRAM)
 psram:
   mode: octal
 
@@ -68,6 +69,7 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
+# Greift nun direkt auf die extern heruntergeladene Plattform zu
 touchscreen:
   - platform: focaltech
     id: my_touchscreen
