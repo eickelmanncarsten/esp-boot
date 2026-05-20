@@ -66,10 +66,10 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Der offizielle, native Core-Treiber für deine ESPHome-Version
+# Der exakte, native Treiber für den verbauten FT6336 auf dem Waveshare-Board
 touchscreen:
-  - platform: tt21100
+  - platform: focaltech
     id: my_touchscreen
     display: display_lcd
     address: 0x38
-    interrupt_pin: GPIO5  # Zwingt den Touch-Controller in den geregelten Zustand
+    interrupt_pin: GPIO5
