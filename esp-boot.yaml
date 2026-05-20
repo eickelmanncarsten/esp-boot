@@ -72,3 +72,4 @@ touchscreen:
     id: my_touchscreen
     display: display_lcd
     address: 0x38
+    interrupt_pin: GPIO5  # Zwingt den Touch-Controller in den geregelten Zustand
