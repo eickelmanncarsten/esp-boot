@@ -30,11 +30,12 @@ improv_serial:
 captive_portal:
 
 i2c:
-  sda: GPIO6
-  scl: GPIO7
-  frequency: 100kHz
-  sda_pullup_enabled: true
-  scl_pullup_enabled: true
+  - id: bus_a
+    sda: GPIO6
+    scl: GPIO7
+    frequency: 100kHz
+    sda_pullup_enabled: true
+    scl_pullup_enabled: true
 
 spi:
   - id: spi_bus
