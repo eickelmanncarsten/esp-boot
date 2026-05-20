@@ -1,1 +1,9 @@
+#include "esphome.h"
 
+class CustomTouch : public esphome::Component, public esphome::i2c::I2CDevice {
+ public:
+  void setup() override {
+    ESP_LOGD("custom_touch", "Initialisiere FocalTech Touchscreen auf Adresse 0x%02X...", this->address_);
+  }
+  void loop() override {}
+};
