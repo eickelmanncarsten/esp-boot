@@ -1,5 +1,7 @@
 #pragma once
 #include "esphome.h"
+#include "esphome/core/component.h"
+#include "esphome/components/output/binary_output.h"
 
 namespace custom_backlight {
 
@@ -11,12 +13,10 @@ class CustomBacklightOutput : public esphome::output::BinaryOutput, public espho
   void set_pin_hub(esphome::Component *hub) { this->hub_ = hub; }
 
   void setup() override {
-    // Hier kommt deine originale Initialisierung für den PCA9554-Pin des Backlights hin
-    // Da wir den Hub als Pointer haben, kannst du ihn direkt ansprechen.
+    // Hier kommt deine originale Initialisierung hin
   }
 
   void write_state(bool state) override {
-    // Hier wird das Backlight ein- oder ausgeschaltet
     if (state) {
       ESP_LOGD("backlight", "Backlight wird eingeschaltet...");
     } else {
