@@ -2,17 +2,21 @@ esphome:
   name: esp-boot
   friendly_name: ESP-Boot
 
+# Hier zwingen wir ESPHome, die Focaltech-Komponente direkt aus dem Core-Repo zu laden
 external_components:
   - source:
       type: local
       path: my_components
+  - source:
+      type: git
+      url: https://github.com/esphome/esphome
+      components: [ focaltech ]
 
 esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
 
-# Zwingend erforderlich für den ESP32-S3 bei großen Displays
 psram:
   mode: octal
 
@@ -66,10 +70,9 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Der korrekte Treiber für deinen FocalTech-Touchscreen
+# Nun greift die sauber importierte focaltech-Plattform
 touchscreen:
-  - platform: focaltech_touch
+  - platform: focaltech
     id: my_touchscreen
     display: display_lcd
     address: 0x38
-    # interrupt_pin: GPIOX # Falls ein IRQ-Pin angeschlossen ist, hier eintragen
