@@ -2,7 +2,7 @@ esphome:
   name: esp-boot
   friendly_name: ESP-Boot
 
-# Hier zwingen wir ESPHome, die Focaltech-Komponente direkt aus dem Core-Repo zu laden
+# JETZT RECHTSCHREIB- UND EINRÜCKUNGSCONFORM:
 external_components:
   - source:
       type: local
@@ -10,7 +10,7 @@ external_components:
   - source:
       type: git
       url: https://github.com/esphome/esphome
-      components: [ focaltech ]
+    components: [ focaltech ] # Genau hier auf der Ebene von 'source'!
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -70,7 +70,7 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Nun greift die sauber importierte focaltech-Plattform
+# Der Touchscreen nutzt nun die über Git bereitgestellte Plattform
 touchscreen:
   - platform: focaltech
     id: my_touchscreen
