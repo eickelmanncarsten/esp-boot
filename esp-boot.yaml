@@ -1,14 +1,17 @@
 esphome:
   name: esp-boot
-  friendly_name: ESP-Boot
   on_boot:
-    priority: -100
+    priority: 800.0  # Sehr hohe Priorität, läuft vor fast allem anderen
     then:
-      # Nutzt jetzt den nativen Switch-Befehl
-      - switch.turn_on: backlight_switch
-  includes:
-    - my_components/custom_touch.h
-    - my_components/custom_backlight.h
+      - text_sensor.template.publish:
+          id: bst
+          state: "Booting..."
+      # Wir initialisieren den Touch-Reset manuell und ziehen ihn auf HIGH
+      - lambda: |-
+          pinMode(5, OUTPUT);     // Ersetze 5 mit deinem Touch-Reset-Pin
+          digitalWrite(5, LOW);   // Kurz resetten
+          delay(10);
+          digitalWrite(5, HIGH);  // Aktivieren, damit er den I2C-Bus freigibt
 
 esp32:
   board: esp32-s3-devkitc-1
