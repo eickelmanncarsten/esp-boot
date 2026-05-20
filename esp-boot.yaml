@@ -13,7 +13,7 @@ esphome:
 esp32:
   board: esp32-s3-devkitc-1
   framework:
-    type: esp-idf
+    type: arduino
 
 psram:
   mode: octal
@@ -33,9 +33,7 @@ i2c:
   - id: bus_a
     sda: GPIO6
     scl: GPIO7
-    frequency: 100kHz
-    sda_pullup_enabled: true
-    scl_pullup_enabled: true
+    frequency: 400000Hz  # Kann unter Arduino ruhig auf 400k stehen bleiben
 
 spi:
   - id: spi_bus
