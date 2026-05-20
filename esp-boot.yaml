@@ -1,13 +1,14 @@
 esphome:
   name: esp-boot
+  # Hier gehört das Einbinden von Arduino-Bibliotheken für PlatformIO hin:
+  platformio_options:
+    lib_deps:
+      - Wire
 
 esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: arduino
-    # Hier zwingen wir PlatformIO, die Wire-Bibliothek einzubinden:
-  libraries:
-    - Wire
 
 psram:
   mode: octal
@@ -22,18 +23,15 @@ wifi:
 improv_serial:
 captive_portal:
 
-# Wir binden unseren lokalen Ordner als externe Komponente ein
 external_components:
   - source:
       type: local
       path: .
     components: [ my_custom_i2c ]
 
-# Aktiviert unsere Custom-I2C-Komponente beim Booten
 my_custom_i2c:
 
-# Wir legen den offiziellen I2C-Bus auf ungenutzte Dummy-Pins,
-# damit der IDF-Treiber die echten Leitungen (6 und 7) nicht blockiert!
+# Dummy-I2C, um den IDF-Treiber von den echten Pins fernzuhalten
 i2c:
   id: bus_dummy
   sda: GPIO1
