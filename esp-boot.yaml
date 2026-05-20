@@ -72,8 +72,7 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Hier wird deine neue, native External Component aufgerufen:
-custom_touch:# Am Ende der Datei: Einfach nur die Komponente aktivieren
+custom_touch:
 
 
 
