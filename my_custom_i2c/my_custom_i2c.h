@@ -5,6 +5,9 @@
 
 namespace esphome {
 
+// Wir erstellen eine dedizierte Instanz für den zweiten Hardware-I2C-Port (1)
+TwoWire MyWire(1);
+
 class MyCustomI2CComponent : public Component {
  public:
   void setup() override {
@@ -18,32 +21,33 @@ class MyCustomI2CComponent : public Component {
     delay(50);
     digitalWrite(5, HIGH);
     digitalWrite(40, HIGH);
-    delay(100);
+    delay(150); // Dem Bus etwas mehr Zeit geben, sich elektrisch einzupendeln
 
-    // 2. Den echten I2C-Bus mit der Arduino Wire-Bibliothek initialisieren
-    ::Wire.begin(6, 7, 100000); 
+    ESP_LOGD("custom_i2c", "Initialisiere Arduino Wire auf Hardware-Port 1...");
+    // 2. Den echten I2C-Bus (Pins 6 & 7) auf dem freien Port 1 starten
+    MyWire.begin(6, 7, 100000); 
     
     // 3. Den PCA9554 (0x20) direkt ansprechen und das Backlight einschalten
-    ::Wire.beginTransmission(0x20);
-    byte error = ::Wire.endTransmission();
+    MyWire.beginTransmission(0x20);
+    byte error = MyWire.endTransmission();
     
     if (error == 0) {
-      ESP_LOGI("custom_i2c", "Erfolg! PCA9554 an 0x20 reagiert auf Arduino Wire!");
+      ESP_LOGI("custom_i2c", "+++ ERFOLG! PCA9554 an 0x20 reagiert auf Port 1 +++");
       
       // Pin 0 (Backlight) als Ausgang definieren
-      ::Wire.beginTransmission(0x20);
-      ::Wire.write(0x03); // Konfigurationsregister
-      ::Wire.write(0xFE); // Pin 0 = Output, Rest = Input
-      ::Wire.endTransmission();
+      MyWire.beginTransmission(0x20);
+      MyWire.write(0x03); // Konfigurationsregister
+      MyWire.write(0xFE); // Pin 0 = Output, Rest = Input
+      MyWire.endTransmission();
 
       // Pin 0 auf HIGH setzen (Backlight einschalten)
-      ::Wire.beginTransmission(0x20);
-      ::Wire.write(0x01); // Ausgangsregister
-      ::Wire.write(0x01); // Pin 0 auf HIGH
-      ::Wire.endTransmission();
-      ESP_LOGI("custom_i2c", "Backlight-Befehl erfolgreich gesendet!");
+      MyWire.beginTransmission(0x20);
+      MyWire.write(0x01); // Ausgangsregister
+      MyWire.write(0x01); // Pin 0 auf HIGH
+      MyWire.endTransmission();
+      ESP_LOGI("custom_i2c", "Backlight-Befehl wurde erfolgreich abgesetzt!");
     } else {
-      ESP_LOGE("custom_i2c", "PCA9554 hat nicht geantwortet. Fehlercode: %d", error);
+      ESP_LOGE("custom_i2c", "PCA9554 hat auf Port 1 nicht geantwortet. Fehlercode: %d", error);
     }
   }
 };
