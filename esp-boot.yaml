@@ -6,6 +6,9 @@ esphome:
     priority: -100
     then:
       - output.turn_on: backlight_output
+  # Hier binden wir deine C++ Datei ein, die im Unterordner liegt:
+  includes:
+    - my_components/custom_touch.h
 
 external_components:
   - source:
@@ -72,17 +75,10 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Unsere unzerstörbare Inline-Komponente, die den Touchscreen-Fehler umgeht
-custom_component:
-  - lambda: |-
-      class CustomTouch : public Component, public i2c::I2CDevice {
-       public:
-        void setup() override {
-          ESP_LOGD("custom_touch", "Initialisiere FocalTech Touchscreen auf Adresse 0x%02X...", this->address_);
-        }
-        void loop() override {}
-      };
-      
+# Das ersetzt den alten custom_component Block sauber für moderne ESPHome-Versionen
+sensor:
+  - platform: custom
+    lambda: |-
       auto my_touch = new CustomTouch();
       my_touch->set_i2c_bus(id(bus_a));
       my_touch->set_i2c_address(0x38);
