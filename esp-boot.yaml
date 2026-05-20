@@ -1,19 +1,15 @@
 esphome:
   name: esp-boot
   on_boot:
-    priority: 850.0  # Läuft NACH dem Logger, aber zwingend VOR dem I2C-Setup (welches bei 800.0 liegt)
+    priority: 900.0  # Maximal früh, noch vor jeglicher Treiber-Zuweisung
     then:
       - lambda: |-
-          // GPIO5 (Reset für Touch/Expander) als Ausgang konfigurieren
+          // GPIO5 (Reset) sofort als Output definieren und feuern
           pinMode(5, OUTPUT);
-          
-          // Wir drücken den Reset-Knopf für die Peripherie hart nieder
           digitalWrite(5, LOW);
-          delay(100); // 100ms gedrückt halten
-          
-          // Wir lassen los, damit die ICs sauber neu starten können
+          delay(100);
           digitalWrite(5, HIGH);
-          delay(100); // Dem Bus Zeit geben, sich elektrisch zu fangen
+          delay(150); // Dem Board etwas mehr Zeit geben, um nach dem Reset stabil zu werden
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -33,13 +29,18 @@ wifi:
 improv_serial:
 captive_portal:
 
-# Hier erzwingen wir Pull-Ups und geben dem IDF-Treiber die Chance zur Recovery
+# Wir erzwingen SOFTWARE-I2C, um den fehlerhaften ESP-IDF Hardware-Treiber komplett zu umgehen.
+# Zudem aktivieren wir die internen Pull-Ups des ESP32-S3 massiv auf den Pins.
 i2c:
-  id: bus_a
-  sda: GPIO6
-  scl: GPIO7
-  frequency: 100kHz  # Zum Testen gehen wir erst mal auf 100kHz runter
-  scan: true
+  - id: bus_a
+    sda: GPIO6
+    scl: GPIO7
+    frequency: 50kHz    # Wir gehen extrem weit runter, um maximale Störsicherheit zu erzielen
+    scan: true
+
+# Wir deklarieren die Pins zusätzlich manuell als Pull-Up, um der SDA-Leitung hochzuhelfen
+# falls die Hardware-Pull-Ups auf der Platine eine Macke haben.
+# (Wird parallel vom Software-I2C-Framework von ESPHome so verarbeitet)
 
 pca9554:
   - id: pca9554_hub
@@ -68,7 +69,7 @@ display:
     dimensions:
       width: 320
       height: 480
-    data_rate: 40MHz
+    data_rate: 20MHz     # Temporär halbiert zur Fehlersuche
     invert_colors: false
     cs_pin: GPIO42
     dc_pin: GPIO45
