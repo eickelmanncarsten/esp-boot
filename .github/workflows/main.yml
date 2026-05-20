@@ -24,7 +24,7 @@ jobs:
           path: |
             ~/.platformio
             ~/.esphome
-          key: ${{ runner.os }}-esphome-v1
+          key: ${{ runner.os }}-esphome-v5
           restore-keys: |
             ${{ runner.os }}-esphome-
 
