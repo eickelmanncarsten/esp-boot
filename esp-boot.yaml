@@ -1,8 +1,6 @@
 esphome:
   name: esp-boot
   friendly_name: ESP-Boot
-  includes:
-    - my_components/custom_touch/custom_touch.h
 
 external_components:
   - source:
@@ -64,13 +62,28 @@ display:
     dc_pin: GPIO45
     reset_pin: GPIO40
     rotation: 0°
+    update_interval: 1s  # Zwingt das Display, sich jede Sekunde neu aufzubauen
     lambda: |-
-      it.fill(Color(255, 0, 0));
+      it.fill(Color(255, 0, 0)); // Zeichnet das Display permanent rot
 
-# Ruft unsere eigene, fehlerfreie C++ Komponente auf
+# Sobald der ESP32 fertig gebootet hat, knipsen wir das Backlight an!
+esphome:
+  on_boot:
+    priority: -100 # Wartet, bis absolut ALLES (auch der PCA9554) bereit ist
+    then:
+      - output.turn_on: backlight_output
+
 custom_component:
   - lambda: |-
-      auto my_touch = new esphome::custom_touch::CustomTouch();
+      class CustomTouch : public Component, public i2c::I2CDevice {
+       public:
+        void setup() override {
+          ESP_LOGD("custom_touch", "Initialisiere FocalTech Touchscreen auf Adresse 0x%02X...", this->address_);
+        }
+        void loop() override {}
+      };
+      
+      auto my_touch = new CustomTouch();
       my_touch->set_i2c_bus(id(bus_a));
       my_touch->set_i2c_address(0x38);
       return {my_touch};
