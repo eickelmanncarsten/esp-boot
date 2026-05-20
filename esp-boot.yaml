@@ -41,10 +41,11 @@ improv_serial:
 captive_portal:
 
 i2c:
-  - id: bus_a
-    sda: GPIO6
-    scl: GPIO7
-    frequency: 400000Hz
+  id: bus_a
+  sda: GPIO6
+  scl: GPIO7
+  frequency: 100kHz  # Wir starten konservativ
+  scan: true
 
 spi:
   - id: spi_bus
