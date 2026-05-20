@@ -1,22 +1,26 @@
 esphome:
   name: esp-boot
+  # Falls du eine separate custom_touch.h Datei hast, lade sie hier:
+  # includes:
+  #   - custom_touch.h
   on_boot:
     priority: 800.0  # Läuft ganz am Anfang, noch vor dem I2C-Setup
     then:
       - lambda: |-
-          // Wir konfigurieren den Pin als Ausgang und ziehen ihn auf HIGH
+          // Wir konfigurieren Pin 5 als Ausgang und ziehen ihn auf HIGH
           gpio_config_t io_conf = {};
           io_conf.intr_type = GPIO_INTR_DISABLE;
           io_conf.mode = GPIO_MODE_OUTPUT;
-          io_conf.pin_bit_mask = (1ULL << 5); // <--- Hier die 5 durch deinen Touch-Reset-Pin ersetzen
+          io_conf.pin_bit_mask = (1ULL << 5); 
           io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
           io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
           gpio_config(&io_conf);
 
           // Erst kurz LOW für den Reset, dann HIGH, um den Bus freizugeben
-          gpio_set_level((gpio_num_t)5, 0); // <--- Hier auch die Pin-Nummer anpassen
-          esp_rom_delay_us(10000);          // 10 Millisekunden warten
-          gpio_set_level((gpio_num_t)5, 1); // <--- Und hier
+          gpio_set_level((gpio_num_t)5, 0); 
+          esp_rom_delay_us(10000);          
+          gpio_set_level((gpio_num_t)5, 1); 
+
 esp32:
   board: esp32-s3-devkitc-1
   framework:
@@ -40,7 +44,7 @@ i2c:
   - id: bus_a
     sda: GPIO6
     scl: GPIO7
-    frequency: 400000Hz  # Kann unter Arduino ruhig auf 400k stehen bleiben
+    frequency: 400000Hz
 
 spi:
   - id: spi_bus
@@ -52,19 +56,17 @@ pca9554:
     address: 0x20
     i2c_id: bus_a
 
-# Das Backlight steuern wir jetzt über einen absolut standardkonformen Template-Switch!
+# Das Backlight direkt über den PCA9554 Port-Expander steuern!
+# (Sollte es Pin 0 nicht sein, versuche hier testweise 'number: 1')
 switch:
-  - platform: template
+  - platform: gpio
     name: "Backlight"
     id: backlight_switch
-    optimistic: true
-    turn_on_action:
-      lambda: |-
-        my_bl.set_pin_hub(id(pca9554_hub));
-        my_bl.set_state(true);
-    turn_off_action:
-      lambda: |-
-        my_bl.set_state(false);
+    pin:
+      pca9554: pca9554_hub
+      number: 0
+      mode: OUTPUT
+    inverted: false
 
 display:
   - platform: ili9xxx
@@ -84,15 +86,6 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Um den Touchscreen beim Booten einmalig zu initialisieren, 
-# hängen wir uns einfach stressfrei in eine native Boot-Komponente
-interval:
-  - interval: 60s
-    then:
-      - lambda: |-
-          static bool initialized = false;
-          if (!initialized) {
-            auto touch = new CustomTouch();
-            touch->setup();
-            initialized = true;
-          }
+# Den Intervall-Block mit dem CustomTouch lassen wir erst mal weg, 
+# bis der I2C-Bus und das Display laufen. 
+# (Falls du ihn brauchst, aktivieren wir ihn wieder zusammen mit der passenden .h-Datei)
