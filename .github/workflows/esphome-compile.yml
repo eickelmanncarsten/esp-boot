@@ -44,12 +44,13 @@ jobs:
     - name: Compile ESP-Boot
       run: esphome compile esp-boot.yaml
     
-    - name: Upload firmware artifact
+    - name: Upload Firmware Artifacts
       if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: firmware-esp-boot
+        name: esp-boot-firmware
         path: |
+          .esphome/build/esp-boot/.pioenvs/esp-boot/firmware.bin
           .esphome/build/esp-boot/.pioenvs/esp-boot/firmware.factory.bin
           .esphome/build/esp-boot/.pioenvs/esp-boot/firmware.ota.bin
         retention-days: 30
