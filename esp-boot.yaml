@@ -30,11 +30,11 @@ improv_serial:
 captive_portal:
 
 i2c:
-  - id: bus_a
-    sda: GPIO6
-    scl: GPIO7
-    frequency: 400khz
-    scan: true
+  sda: GPIO6
+  scl: GPIO7
+  frequency: 100kHz  # Testweise von 400kHz runtergehen
+  sda_pullup: true
+  scl_pullup: true
 
 spi:
   - id: spi_bus
