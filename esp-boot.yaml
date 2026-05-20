@@ -12,14 +12,13 @@ esp32:
   framework:
     type: esp-idf
 
-# LÖSUNG FÜR DEN SPEICHER: Aktiviert den externen PSRAM für den Display-Puffer
+# Zwingend erforderlich für den ESP32-S3 bei großen Displays
 psram:
   mode: octal
 
 logger:
   level: DEBUG
 
-# Setze hier deine echten WLAN-Daten ein!
 wifi:
   ssid: "FRITZ!Box 7590 JL"
   password: "28182272528993262336"
@@ -62,19 +61,15 @@ display:
     invert_colors: false
     cs_pin: GPIO42
     dc_pin: GPIO45
-    # Hinweis: GPIO45 ist ein Strapping-Pin. Wenn das Display beim Booten zickt,
-    # liegt das an der Hardware-Vorgabe des Waveshare-Boards.
     reset_pin: GPIO40
     rotation: 0°
     lambda: |-
       it.fill(Color(255, 0, 0));
-      
- touchscreen:
+
+# Der korrekte Treiber für deinen FocalTech-Touchscreen
+touchscreen:
   - platform: ft6336r
     id: my_touchscreen
     display: display_lcd
-    # Adresse ist bei FocalTech fast immer standardmäßig 0x38
-    address: 0x38  
-    # Hier kommen die Pins hin, an denen der Interrupt (IRQ) 
-    # und eventuell Reset des Touch-Chips hängen, falls genutzt:
-    # interrupt_pin: GPIOX
+    address: 0x38
+    # interrupt_pin: GPIOX # Falls ein IRQ-Pin angeschlossen ist, hier eintragen
