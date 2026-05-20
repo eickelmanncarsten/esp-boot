@@ -6,10 +6,8 @@ external_components:
   - source:
       type: local
       path: my_components
-  # Holt die saubere, moderne Touch-Implementierung direkt aus dem verlässlichen Community-Zweig
-  - source:
-      type: git
-      url: https://github.com/vpaeder/esphome-focaltech
+  # Die korrekte, kompakte Syntax inklusive Branch-Angabe (@main)
+  - source: github://vpaeder/esphome-focaltech@main
     components: [ focaltech ]
 
 esp32:
@@ -70,7 +68,6 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Nutzt nun die über das externe Git sauber bereitgestellte Plattform
 touchscreen:
   - platform: focaltech
     id: my_touchscreen
