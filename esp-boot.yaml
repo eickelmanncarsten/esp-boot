@@ -6,16 +6,13 @@ external_components:
   - source:
       type: local
       path: my_components
-  # Holt die exakt passende, stabile Touch-Komponente aus dem offiziellen ESPHome-Release
-  - source: github://esphome/esphome@v2024.4.0
-    components: [ focaltech ]
 
 esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
 
-# Zwingend notwendig für das Waveshare-Board (8MB Octal-PSRAM)
+# Zwingend notwendig für das Waveshare-Board (ESP32-S3R8 mit 8MB Octal-PSRAM)
 psram:
   mode: octal
 
@@ -69,9 +66,9 @@ display:
     lambda: |-
       it.fill(Color(255, 0, 0));
 
-# Nutzt nun die sauber über Git injizierte Plattform
+# Der offizielle, native Core-Treiber für deine ESPHome-Version
 touchscreen:
-  - platform: focaltech
+  - platform: tt21100
     id: my_touchscreen
     display: display_lcd
     address: 0x38
