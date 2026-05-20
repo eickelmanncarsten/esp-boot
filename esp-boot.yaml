@@ -1,15 +1,7 @@
 esphome:
   name: esp-boot
-  on_boot:
-    priority: 900.0  # Maximal früh, noch vor jeglicher Treiber-Zuweisung
-    then:
-      - lambda: |-
-          // GPIO5 (Reset) sofort als Output definieren und feuern
-          pinMode(5, OUTPUT);
-          digitalWrite(5, LOW);
-          delay(100);
-          digitalWrite(5, HIGH);
-          delay(150); // Dem Board etwas mehr Zeit geben, um nach dem Reset stabil zu werden
+  includes:
+    - custom_i2c.h
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -29,37 +21,28 @@ wifi:
 improv_serial:
 captive_portal:
 
-# Wir erzwingen SOFTWARE-I2C, um den fehlerhaften ESP-IDF Hardware-Treiber komplett zu umgehen.
-# Zudem aktivieren wir die internen Pull-Ups des ESP32-S3 massiv auf den Pins.
+# Wir legen den offiziellen I2C-Bus auf ungenutzte Dummy-Pins,
+# damit der IDF-Treiber die echten Leitungen (6 und 7) nicht blockieren kann!
 i2c:
-  - id: bus_a
-    sda: GPIO6
-    scl: GPIO7
-    frequency: 50kHz    # Wir gehen extrem weit runter, um maximale Störsicherheit zu erzielen
-    scan: true
+  id: bus_dummy
+  sda: GPIO1
+  scl: GPIO2
 
-# Wir deklarieren die Pins zusätzlich manuell als Pull-Up, um der SDA-Leitung hochzuhelfen
-# falls die Hardware-Pull-Ups auf der Platine eine Macke haben.
-# (Wird parallel vom Software-I2C-Framework von ESPHome so verarbeitet)
-
-pca9554:
-  - id: pca9554_hub
-    address: 0x20
-    i2c_id: bus_a
-
-switch:
-  - platform: gpio
-    name: "Backlight"
-    id: backlight_switch
-    pin:
-      pca9554: pca9554_hub
-      number: 0
-      mode: OUTPUT
+# Aktiviert unsere eigene I2C-Initialisierung direkt beim Start
+custom_component:
+  - lambda: |-
+      auto my_custom_i2c = new CustomI2CInit();
+      return {my_custom_i2c};
 
 spi:
   - id: spi_bus
     clk_pin: GPIO47
     mosi_pin: GPIO41
+
+# Den normalen pca9554-Block kommentieren wir aus, da wir ihn im C++-Code steuern
+# pca9554:
+#   - id: pca9554_hub
+#     address: 0x20
 
 display:
   - platform: ili9xxx
@@ -69,7 +52,7 @@ display:
     dimensions:
       width: 320
       height: 480
-    data_rate: 20MHz     # Temporär halbiert zur Fehlersuche
+    data_rate: 40MHz
     invert_colors: false
     cs_pin: GPIO42
     dc_pin: GPIO45
