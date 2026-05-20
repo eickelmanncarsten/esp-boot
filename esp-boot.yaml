@@ -1,7 +1,5 @@
 esphome:
   name: esp-boot
-  includes:
-    - custom_i2c.h
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -21,28 +19,27 @@ wifi:
 improv_serial:
 captive_portal:
 
+# Wir binden unseren lokalen Ordner als externe Komponente ein
+external_components:
+  - source:
+      type: local
+      path: .
+    components: [ my_custom_i2c ]
+
+# Aktiviert unsere Custom-I2C-Komponente beim Booten
+my_custom_i2c:
+
 # Wir legen den offiziellen I2C-Bus auf ungenutzte Dummy-Pins,
-# damit der IDF-Treiber die echten Leitungen (6 und 7) nicht blockieren kann!
+# damit der IDF-Treiber die echten Leitungen (6 und 7) nicht blockiert!
 i2c:
   id: bus_dummy
   sda: GPIO1
   scl: GPIO2
 
-# Aktiviert unsere eigene I2C-Initialisierung direkt beim Start
-custom_component:
-  - lambda: |-
-      auto my_custom_i2c = new CustomI2CInit();
-      return {my_custom_i2c};
-
 spi:
   - id: spi_bus
     clk_pin: GPIO47
     mosi_pin: GPIO41
-
-# Den normalen pca9554-Block kommentieren wir aus, da wir ihn im C++-Code steuern
-# pca9554:
-#   - id: pca9554_hub
-#     address: 0x20
 
 display:
   - platform: ili9xxx
