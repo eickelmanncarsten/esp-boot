@@ -17,8 +17,8 @@ logger:
   level: DEBUG
 
 wifi:
-  ssid: "FRITZ!Box 7590 JL"
-  password: "28182272528993262336"
+  ssid: "JL"
+  password: "xxxxxxxxx"
 
 improv_serial:
 captive_portal:
